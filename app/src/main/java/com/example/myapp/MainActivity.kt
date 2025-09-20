@@ -1,17 +1,17 @@
 package com.example.myapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.widget.TextView
 import android.widget.Button
-import android.widget.EditText
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AlertDialog
+
+
 class MainActivity : AppCompatActivity() {
 
 
@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    @SuppressLint("QueryPermissionsNeeded", "UseKtx")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,23 +29,46 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        val mainLayout: ConstraintLayout = findViewById(R.id.main)
-        val editText: EditText = findViewById(R.id.edit_text)
+
         val btnClick: Button = findViewById(R.id.btn_hitung)
+        val btnSecond: Button = findViewById(R.id.btn_second)
 
         btnClick.setOnClickListener {
-            val teks: String = editText.text.toString()
-//            Snackbar.make(mainLayout, teks, Snackbar.LENGTH_SHORT).show()
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("myapp")
-            builder.setMessage(teks)
-            builder.setPositiveButton("tutup"){
-                dialog, which ->
-                dialog.dismiss()
-            }
+//            explicit intent
+            val intent = Intent(this, MainActivity2::class.java)
+            intent.putExtra("text", "ini adalah data teks saya")
+//            intent.putExtra( "number",  123)
+            startActivity(intent)
+        }
 
-            val dialog = builder.create()
-            dialog.show()
+        btnSecond.setOnClickListener {
+            val url = "https://googley.com"
+
+
+            // Coba cara pertama
+            try {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(url)
+                startActivity(intent)
+
+
+            } catch (e: Exception) {
+                // Jika gagal, coba cara kedua dengan package name browser
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.data = Uri.parse(url)
+                    intent.setPackage("com.android.chrome") // Force menggunakan Chrome
+                    startActivity(intent)
+
+                } catch (e: Exception) {
+                    // Jika masih gagal, tampilkan error
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Error: ${e.localizedMessage}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
     }
 }
